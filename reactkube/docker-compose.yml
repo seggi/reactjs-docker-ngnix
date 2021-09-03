@@ -1,0 +1,35 @@
+version: '3.7'
+
+services: 
+  dev :
+    container_name: 2u-react-app
+    image: nankim/2u-react-app
+    stdin_open: true
+    command: npm run start
+    environment: 
+      - CHOKIDAR_USERPOLLING=true
+    build:
+      context: .
+      target: development
+      dockerfile: ./Dockerfile.dev
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  prod :
+    container_name: 2u-react-app-prod
+    image: nankim/2u-react-app-prod
+    build:
+      context: .
+      target: production
+      dockerfile: ./Dockerfile
+    command: npm start
+    ports:
+      - 3000:80
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  

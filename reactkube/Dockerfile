@@ -1,16 +1,22 @@
-# Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:10.8.0 as build-stage
-WORKDIR /app
-COPY package*.json /app/
-RUN npm install
-COPY ./ /app/
-ARG configuration=uat
-EXPOSE 80
-RUN npm run build --configuration $configuration
+FROM  node:12.19.0-alpine3.9  AS production
 
-# Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginx:1.15
-#Copy ci-dashboard-dist
-COPY --from=build-stage /app/dist/lfa/ /usr/share/nginx/html
-#Copy default nginx configuration
-COPY ./nginx/nginx-custom.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app
+
+COPY package.json ./
+
+COPY yarn.lock ./
+
+RUN yarn install --frozen-lockfile
+
+COPY . .
+
+RUN yarn build
+
+FROM nginx:1.19-alpine AS server
+
+COPY  ./nginx/default.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=production ./app/build /usr/share/nginx/html
+
+
+
