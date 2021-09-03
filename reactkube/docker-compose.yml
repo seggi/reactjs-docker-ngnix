@@ -2,8 +2,8 @@ version: '3.7'
 
 services: 
   dev :
-    container_name: 2u-react-app
-    image: nankim/2u-react-app
+    container_name: nk-react-app
+    image: nankim/nk-react-app
     stdin_open: true
     command: npm run start
     environment: 
@@ -19,13 +19,11 @@ services:
       - /usr/src/app/node_modules
 
   prod :
-    container_name: 2u-react-app-prod
-    image: nankim/2u-react-app-prod
+    container_name: nk-react-app-prod
+    image: nankim/nk-react-app-prod
     build:
       context: .
-      target: production
       dockerfile: ./Dockerfile
-    command: npm start
     ports:
       - 3000:80
     volumes:
