@@ -16,8 +16,8 @@ jobs:
     - uses: azure/docker-login@v1
       with:
         login-server: nankimACR.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+        password: ${{ secrets.AZURE_REGISTRY_ACCESS_TOKEN }}
     - run: |
         docker build . -t nankimACR.azurecr.io/reactapp:${{ github.sha }}
         docker push nankimACR.azurecr.io/reactapp:${{ github.sha }}
@@ -28,7 +28,7 @@ jobs:
         resource-group: NKRG
         dns-name-label: url-for-container
         image: nankimACR.azurecr.io/reactapp:${{ github.sha }}
-        registry-username: ${{ secrets.REGISTRY_USERNAME }}
-        registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        registry-username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+        registry-password: ${{ secrets.AZURE_REGISTRY_ACCESS_TOKEN}}
         name: nankim-container
         location: 'west us'
