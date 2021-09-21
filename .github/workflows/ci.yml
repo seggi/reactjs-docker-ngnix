@@ -9,13 +9,10 @@ jobs:
         - name: 'Checkout GitHub Action'
           uses: actions/checkout@main
           
- 
-        - name: "Sample Azure action"
-          with: # Set Azure credentials secret as an input
-            credentials: ${{ secrets.AZURE_CREDENTIALS }}
-#           env: # Or as an environment variable
-#             credentials: ${{ secrets.AZURE_CREDENTIALS }}
-
+        - name: 'Login via Azure CLI'
+#           uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
         
         - name: 'Build and push image'
           uses: azure/docker-login@v1
@@ -23,9 +20,8 @@ jobs:
             login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
-            
         - run: |
-            docker build ./reactkube/ -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }} 
+            docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
 
         - name: 'Deploy to Azure Container Instances'
