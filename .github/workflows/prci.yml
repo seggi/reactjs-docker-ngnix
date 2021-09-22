@@ -1,0 +1,79 @@
+name: PR workflow nankim
+
+on:
+    pull_request:
+        branches:
+            - main
+            
+env:
+    # Basic 
+    resourceGroup: NKRG
+    location: estus
+    
+    # subName: "nankim"
+    
+    # app specific
+    acrName: nankimACR
+    
+    # storage
+    #     storage_account_name: 
+    
+    # aci 
+    #     pr_image_name: nankim-image
+
+jobs:
+    build:
+        name: Build / Push to ACR
+        runs-on: ubuntu-latest
+        steps:
+        # checkout branch
+        - name: 'Checkout GitHub Action'
+          uses: actions/checkout@main
+          
+        - name: 'Login via Azure CLI'
+          uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+        - name: 'docker login'
+          uses: azure/docker-login@v1
+          with:
+            login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+        
+        
+        -  name: "build image"
+           run: |
+             docker build ./reactkube/ -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nknode:${{ github.sha }}
+             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+            
+    deploy:
+        name: Deploy to ACI
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+        # Check branch 
+        - name: git checkout main branch
+          uses: actions/checkout@v2
+
+        # log to Azure
+        - name: "Login via Azure ACI"
+          uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+        # 'Create App Image in ACI'
+        -  name: 'Deploy to Azure Container Instances'
+           uses: 'azure/aci-deploy@v1'
+           with:
+                resource-group: ${{ secrets.RESOURCE_GROUP }}
+                dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+                image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+                registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+                registry-username: ${{ secrets.REGISTRY_USERNAME }}
+                registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+                name: aci-sampleapp
+                location: 'west us'
+                    
+            
