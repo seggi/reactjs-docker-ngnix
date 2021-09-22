@@ -1,17 +1,21 @@
-name: Azure CLI Login Tests
-on: 
-  push:
-      branches:
-        - main
+on: [push]
+
+name: AzureLoginSample
+
 jobs:
-  build:
-    runs-on: self-hosted
-    steps:            
-    - name: "Login to Azure"
-      uses: Azure/login@v1
-    - name: "Upload Static Content to Storage"
-      uses: azure/CLI@v1
-      with:
-        azcliversion: 2.24.2
-        inlineScript: |
-                    az group list
+  build-and-deploy:
+      runs-on: ubuntu-latest
+      steps:
+
+      - name: Log in with Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+            az account show
+            az storage -h
