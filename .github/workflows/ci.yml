@@ -46,7 +46,7 @@ jobs:
         -  name: "build image"
            run: |
              docker build ./reactkube/ -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nknode:${{ github.sha }}
-             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nknode:${{ github.sha }}
             
     deploy:
         name: Deploy to ACI
