@@ -1,17 +1,14 @@
 name: Deploy 2u aks image to server
-
-
 on:
-  pull_request:
+  push:
     branches:
       - ch-github-actions-deploy-aks-to-server
-
 jobs:
-    build:
-        name: Build and push to the server
-        runs-on: ubuntu-latest
-        steps:
-        # Check branch
-        - name: Check branch name
-          run: echo running on branch ${GITHUB_REF##*/}
-          id: extract_branch
+  build:
+      name: Build and push to the server
+      runs-on: ubuntu-latest
+      steps:
+      # Check branch
+      - name: Check branch name
+        run: echo running on branch ${GITHUB_REF##*/}
+        id: extract_branch
