@@ -1,0 +1,51 @@
+name: Deploy 2u aks image to server
+on:
+  push:
+    branches:
+      - ch-github-actions-deploy-aks-to-server
+jobs:
+  build:
+      name: Build and push to the server
+      runs-on: ubuntu-latest
+      steps:
+      # Check branch
+      - name: Check branch name
+        shell: bash
+        run: echo running on branch ${GITHUB_REF##*/}
+        id: extract_branch
+      
+      - name: Check branch
+        uses: actions/actions@${{ steps.extract_branch.outputs.branch }}
+      
+      - name: azure/k8-set-context@v1
+        with: 
+          kubeconfig: ${{ secrets.aks_dev-kubeConfig }}
+        id: login
+      
+      - name: Create namespace
+        run: |
+          namespacePresent=`kubectl get namespace | grep ${{ steps.extract_branch.outputs.branch }} | wc - l`
+          if [ $namespacePresent -eq 0 ]
+          then
+            echo `kubectl create namespace ${{ steps.extract_branch.outputs.branch }}`
+          fi
+          
+      - uses: azure/k8s-create-secret@v1
+        with:
+          namespace: ${{ steps.extract_branch.outputs.branch }}
+          container-registry-url: ${{ resigstry.azurecr.io }}
+          container-registry-username: ${{ secrets.AKS_USERNAME }}
+          container-registry-password: ${{ secrets.AKS_PASSWORD }}
+          secret-name: ${{ steps.extract_branch.outputs.branch }}
+          
+      - uses: azure/k8s-deploy@v1
+        with:
+          namespace: ${{ steps.extract_branch.outputs.branch }}
+          manifests: |
+            manifests/deployment.yml
+            manifests/service.yml
+            manifests/ingress.yml
+          images: |
+            ${{ steps.extract_branch.outputs.branch }}.azurecr.io/{{ secrets.CONTAINER_NAME }}${{ github.sha }}
+          imagepullsecrets: |
+            ${{ steps.extract_branch.outputs.branch }}auyh
