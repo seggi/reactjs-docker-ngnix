@@ -1,0 +1,24 @@
+name: Deploy 2u aks image to server
+
+on:
+    push:
+        branches:
+            - ch-github-actions-deploy-aks-to-server
+
+env:
+    # Azure configuration
+    resourcesGroup: ${{ resource group name here }}
+    location: eatus
+    acrName: ${{ container registry name }}
+#     storage: 
+#         storage_account_name: ${{ storage name }}
+
+jobs:
+    build:
+        name: Build and push to the server
+        runs-on: ubuntu-latest
+        steps:
+        # Check branch
+        - name: Check branch name
+          run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          id: extract_branch
