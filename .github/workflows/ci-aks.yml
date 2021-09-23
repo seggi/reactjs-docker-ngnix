@@ -2,9 +2,9 @@ name: Deploy 2u aks image to server
 
 
 on:
-    pull_request:
-        branches:
-            - ch-github-actions-deploy-aks-to-server
+  pull_request:
+    branches:
+      - ch-github-actions-deploy-aks-to-server
 
 jobs:
     build:
