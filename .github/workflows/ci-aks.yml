@@ -21,5 +21,5 @@ jobs:
         steps:
         # Check branch
         - name: Check branch name
-          run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          run: echo running on branch ${GITHUB_REF##*/}
           id: extract_branch
